@@ -1,8 +1,0 @@
-hw09: Calvin Bonomo
-
-I used hw8 as a base for this project. I didn't have a lot of time to devote to this homework due to the network systems exam being on Tuesday, so I devoted the majority of my time to making this actually something you want to look at and use. Also making my densities signed was pretty tough. There's some bugs related to moving steam and water, so I'd like to look into giving particles state and some other stuff.
-
-Controls:
-Click: Add material
-Space: Cycle through materials
-ESC: quit
