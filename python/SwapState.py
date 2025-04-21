@@ -6,7 +6,7 @@ class SwapState:
     self.botRight: int = botRight
 
   def get(self) -> int:
-    return (self.topLeft << 24) | (self.topRight << 16) | (self.botLeft << 8) | self.botLeft
+    return (self.topLeft << 9) | (self.topRight << 6) | (self.botLeft << 3) | self.botLeft
   
   def __eq__(self, other):
     if isinstance(other, SwapState):
