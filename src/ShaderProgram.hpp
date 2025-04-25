@@ -20,6 +20,9 @@ public:
   ShaderProgram();
   ~ShaderProgram();
 
+  void Use();
+  void Stop();
+
   void AttachShader(Shader &shader);
   void Link();
 };

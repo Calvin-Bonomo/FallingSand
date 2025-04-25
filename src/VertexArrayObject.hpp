@@ -12,11 +12,17 @@ class VertexArrayObject
 private:
   GLuint m_ID;
   GLuint m_Size;
+  GLint m_LastAttribute;
 
 public:
-  VertexArrayObject(Buffer<float> &vertices, Buffer<unsigned int> &elements);
+  VertexArrayObject(Buffer &vertices, Buffer &elements);
   ~VertexArrayObject();
+
+  template<typename T>
+  void AddAttribute(bool normalized, unsigned int offset, unsigned int numValues);
 
   void Bind();
   void Unbind();
+private:
+  void Init();
 };

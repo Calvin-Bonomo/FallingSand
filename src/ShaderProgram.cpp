@@ -11,6 +11,16 @@ ShaderProgram::~ShaderProgram()
   glDeleteProgram(m_ID);
 }
 
+void ShaderProgram::Use() 
+{
+  glUseProgram(m_ID);
+}
+
+void ShaderProgram::Stop() 
+{
+  glUseProgram(0);
+}
+
 void ShaderProgram::AttachShader(Shader &shader) 
 {
   if (shader.GetType() == GL_COMPUTE_SHADER) throw std::exception();

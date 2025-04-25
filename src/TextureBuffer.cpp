@@ -1,7 +1,6 @@
 #include "TextureBuffer.hpp"
 
-template<typename T>
-TextureBuffer<T>::TextureBuffer(GLenum internalFormat, std::shared_ptr<Buffer<T>> buffer) 
+TextureBuffer::TextureBuffer(GLenum internalFormat, const Buffer &buffer) 
 {
   glGenTextures(1, &m_ID);
   Bind(0);
@@ -9,21 +8,18 @@ TextureBuffer<T>::TextureBuffer(GLenum internalFormat, std::shared_ptr<Buffer<T>
   Unbind();
 }
 
-template<typename T>
-TextureBuffer<T>::~TextureBuffer() 
+TextureBuffer::~TextureBuffer() 
 {
   glDeleteTextures(1, &m_ID);
 }
 
-template<typename T>
-void TextureBuffer<T>::Bind(GLuint textureUnit) 
+void TextureBuffer::Bind(GLuint textureUnit) 
 {
   glActiveTexture(GL_TEXTURE0 + textureUnit);
   glBindTexture(GL_TEXTURE_BUFFER, m_ID);
 }
 
-template<typename T>
-void TextureBuffer<T>::Unbind() 
+void TextureBuffer::Unbind() 
 {
   glBindTexture(GL_TEXTURE_BUFFER, 0);
 }

@@ -28,3 +28,25 @@ void ComputeProgram::Dispatch(GLuint xThreads, GLuint yThreads, GLuint zThreads)
   glDispatchCompute(xThreads, yThreads, zThreads);
   glUseProgram(0);
 }
+
+void ComputeProgram::SetUniform(const std::string &uniformName, GLuint val) {
+  GLint loc = glGetUniformLocation(m_ID, uniformName.c_str());
+  glUseProgram(m_ID);
+  glUniform1ui(loc, val);
+  glUseProgram(0);
+}
+
+void ComputeProgram::SetUniform(const std::string &uniformName, GLint val[2]) {
+  GLint loc = glGetUniformLocation(m_ID, uniformName.c_str());
+  glUseProgram(m_ID);
+  glUniform2iv(loc, 2, val);
+  glUseProgram(0);
+}
+
+void ComputeProgram::SetUniform(const std::string &uniformName, GLint val) 
+{
+  GLint loc = glGetUniformLocation(m_ID, uniformName.c_str());
+  glUseProgram(m_ID);
+  glUniform1i(loc, val);
+  glUseProgram(0);
+}

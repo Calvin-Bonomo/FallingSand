@@ -9,19 +9,18 @@
 
 #include "Buffer.hpp"
 
-template<typename T>
 class TextureBuffer
 {
 private:
   GLuint m_ID;
-  std::shared_ptr<Buffer<T>> m_Buffer;
+  std::shared_ptr<Buffer> m_Buffer;
 
 public:
-  TextureBuffer(GLenum internalFormat, std::shared_ptr<Buffer<T>> buffer);
+  TextureBuffer(GLenum internalFormat, const Buffer &buffer);
   ~TextureBuffer();
 
   void Bind(GLuint textureUnit);
   void Unbind();
 
-  operator unsigned int() const { return m_ID; }
+  operator int() const { return m_ID; }
 };

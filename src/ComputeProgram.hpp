@@ -10,6 +10,7 @@
 #include <GL/gl.h>
 
 #include "Shader.hpp"
+#include "TextureBuffer.hpp"
 
 class ComputeProgram
 {
@@ -21,5 +22,7 @@ public:
   ~ComputeProgram();
 
   void Dispatch(GLuint xThreads, GLuint yThreads, GLuint zThreads);
-
+  void SetUniform(const std::string &uniformName, GLuint val);
+  void SetUniform(const std::string &uniformName, GLint val[2]);
+  void SetUniform(const std::string &uniformName, GLint val);
 };
