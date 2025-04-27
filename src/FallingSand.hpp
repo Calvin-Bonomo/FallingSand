@@ -10,9 +10,9 @@
 #include "ComputeProgram.hpp"
 #include "ShaderProgram.hpp"
 #include "VertexArrayObject.hpp"
-#include "TextureBuffer.hpp"
 
 #include <string>
+#include <array>
 #include <vector>
 #include <memory>
 
@@ -34,7 +34,6 @@ private:
 
   std::unique_ptr<Buffer> m_CellBuffer;
   std::unique_ptr<Buffer> m_TransitionBuffer; // IDK what to do with this
-  std::unique_ptr<TextureBuffer> m_SimSpaceTexture;
   std::unique_ptr<ComputeProgram> m_ComputeSim;
   std::unique_ptr<ShaderProgram> m_DisplayProgram;
   std::unique_ptr<VertexArrayObject> m_DrawQuad;

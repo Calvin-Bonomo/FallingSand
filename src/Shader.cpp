@@ -57,12 +57,14 @@ void Shader::Attach(GLuint programID)
 
 std::string Shader::ReadShader(const std::string &filename) 
 {
-  std::string source;
+  std::string source, line;
   std::ifstream inStream(filename);
 
   if (inStream.is_open()) { // https://cplusplus.com/forum/beginner/151894/
-    while (inStream.good())
-      getline(inStream, source);
+    while (inStream.good()) {
+      getline(inStream, line);
+      source.append(line).append("\n");
+    }
   }
 
   inStream.close();

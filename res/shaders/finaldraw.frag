@@ -1,4 +1,4 @@
-#version 330
+#version 430
 
 in vec2 texCoord;
 
@@ -13,7 +13,6 @@ const vec3 WATER_COLOR = vec3(.28, .56, .8);
 const float WATER_OPACITY = 0.6;
 const vec3 SMOKE_COLOR = vec3(0.6);
 const float SMOKE_OPACITY = 0.8;
-
 
 // https://gist.github.com/patriciogonzalezvivo/670c22f3966e662d2f83
 float rand(vec2 n) { 
@@ -31,8 +30,8 @@ float noise(vec2 p){
 	return res*res;
 }
 
-float scaled_noise(vec2 sample, float minimum, float maximum) {
-  return noise(sample) * (maximum - minimum) + minimum;
+float scaled_noise(vec2 pos, float minimum, float maximum) {
+  return noise(pos) * (maximum - minimum) + minimum;
 }
 
 bool close_to(float val, float target) {

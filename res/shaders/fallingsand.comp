@@ -2,7 +2,7 @@
 
 layout(local_size_x=32, local_size_y=32) in;
 
-uniform usamplerBuffer buf;
+layout(r8ui) uniform uimage2D buf;
 uniform uint iteration;
 uniform ivec2 simSize;
 
@@ -44,7 +44,7 @@ ivec4 getDensities(uvec4 particles) {
 }
 
 uvec4 getNeighborhood(ivec2 pos) {
-  uvec4 data = uvec4(texelFetch(buf, pos).r, 0, 0, 0);
+  uvec4 data = uvec4(imageLoad(buf, pos).r, 0, 0, 0);
   data.y = imageLoad(buf, pos + ivec2(1,  0)).r;
   data.z = imageLoad(buf, pos + ivec2(0, -1)).r;
   data.w = imageLoad(buf, pos + ivec2(1, -1)).r;
