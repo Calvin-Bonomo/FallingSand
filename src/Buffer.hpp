@@ -33,11 +33,14 @@ public:
   size_t GetElementSize();
 
   operator int() const { return m_ID; }
+
+private:
+  void SetData(const void *data, size_t size);
 };
 
 template<typename T, size_t N>
 void Buffer::Set(const T (&data)[N]) {
-  glNamedBufferData(m_ID, sizeof(T) * N, data, GL_DYNAMIC_DRAW);
+  this->SetData(data, sizeof(T) * N);
 }
 
 template<typename T, size_t N>

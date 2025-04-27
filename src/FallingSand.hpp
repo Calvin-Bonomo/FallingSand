@@ -1,6 +1,9 @@
 #pragma once
 
+#define GL_GLEXT_PROTOTYPES
 #include "GLFW/glfw3.h"
+#include "GL/glu.h"
+#include "GL/gl.h"
 
 #include "Buffer.hpp"
 #include "GLFWContext.hpp"
@@ -36,7 +39,7 @@ private:
   std::unique_ptr<ShaderProgram> m_DisplayProgram;
   std::unique_ptr<VertexArrayObject> m_DrawQuad;
 
-  unsigned int m_SimIterations;
+  unsigned int m_SimIterations = 0;
   int m_SimDim[2] = {DEFAULT_SIM_WIDTH, DEFAULT_SIM_HEIGHT}, m_RenderScale[2];
 
   bool m_MouseDown;

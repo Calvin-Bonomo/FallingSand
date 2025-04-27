@@ -33,3 +33,7 @@ size_t Buffer::GetElementSize()
 {
   return m_ElementSize;
 }
+
+void Buffer::SetData(const void *data, size_t size) {
+  glNamedBufferData(m_ID, size, data, GL_DYNAMIC_DRAW);
+}
