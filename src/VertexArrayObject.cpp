@@ -3,7 +3,7 @@
 VertexArrayObject::VertexArrayObject(Buffer &vertices, Buffer &elements) 
   : m_LastAttribute(-1)
 {
-  this->Init();
+  glCreateVertexArrays(1, &m_ID);
   glVertexArrayVertexBuffer(m_ID, 0, vertices, 0, vertices.GetElementSize());
   Bind();
   elements.Bind(GL_ELEMENT_ARRAY_BUFFER);
@@ -30,9 +30,4 @@ void VertexArrayObject::AddAttribute<float>(bool normalized, unsigned int offset
 {
   glEnableVertexArrayAttrib(m_ID, ++m_LastAttribute);
   glVertexArrayAttribFormat(m_ID, m_LastAttribute, sizeof(float) * numValues, GL_FLOAT, normalized? GL_TRUE : GL_FALSE, offset);
-}
-
-void VertexArrayObject::Init() 
-{
-  glCreateVertexArrays(1, &m_ID);
 }
