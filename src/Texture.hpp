@@ -18,9 +18,6 @@ enum class WrapMode {
 
 class Texture
 {
-protected:
-  virtual void InitializeTexture(const void *data) = 0;
-
 public:
   ~Texture();
 
@@ -30,7 +27,7 @@ public:
   void SetWrapMode(WrapMode mode);
 
 protected:
-  Texture(const void *data, GLenum target, GLenum internalFormat, GLenum type, GLenum pixelFormat);
+  Texture(GLenum target, GLenum type, GLint internalFormat, GLenum pixelFormat);
   Texture(const Texture &) = delete;
   Texture(const Texture &&) = delete;
 
@@ -39,7 +36,8 @@ protected:
 protected:
   GLuint m_ID;
   size_t m_PixelSize;
-  GLenum m_Target, m_InternalFormat, m_PixelFormat, m_Type;
+  GLenum m_Target, m_PixelFormat, m_Type;
+  GLint m_InternalFormat;
 
 private:
   int m_TextureUnit;

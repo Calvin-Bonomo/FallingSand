@@ -83,7 +83,7 @@ inline size_t Texture::TypeToSize(GLenum type)
   return elementSize;
 }
 
-Texture::Texture(const void *data, GLenum target, GLenum type, GLenum internalFormat, GLenum pixelFormat) 
+Texture::Texture(GLenum target, GLenum type, GLint internalFormat, GLenum pixelFormat) 
   : m_Target(target), m_Type(type), m_InternalFormat(internalFormat), 
   m_PixelFormat(pixelFormat), m_PixelSize(TypeToSize(type))
 {
