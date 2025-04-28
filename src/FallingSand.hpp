@@ -10,6 +10,7 @@
 #include "ComputeProgram.hpp"
 #include "ShaderProgram.hpp"
 #include "VertexArrayObject.hpp"
+#include "Texture2D.hpp"
 
 #include <string>
 #include <array>
@@ -17,7 +18,10 @@
 #include <memory>
 
 typedef unsigned char cell_t;
-typedef unsigned short transition_t;
+
+struct point {
+  float x, y;
+};
 
 class FallingSand
 {
@@ -30,10 +34,8 @@ private: // constants
 private:
   GLFWwindow *m_Window;
   unsigned int m_Width, m_Height;
-  std::vector<cell_t> m_CellTypes;
 
-  std::unique_ptr<Buffer> m_CellBuffer;
-  std::unique_ptr<Buffer> m_TransitionBuffer; // IDK what to do with this
+  std::unique_ptr<Texture2D> m_CellsTexture;
   std::unique_ptr<ComputeProgram> m_ComputeSim;
   std::unique_ptr<ShaderProgram> m_DisplayProgram;
   std::unique_ptr<VertexArrayObject> m_DrawQuad;
@@ -51,7 +53,10 @@ public:
   ~FallingSand();
 
   void Play();
+  void SetDimensions(unsigned int width, unsigned int height);
+
 private:
+  void CreateRenderQuad();
   void LoadConfig(std::string path);
   void CreateWindow();
   void Display();

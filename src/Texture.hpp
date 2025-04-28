@@ -41,7 +41,4 @@ protected:
 
 private:
   int m_TextureUnit;
-
-private:
-  void CreateTexture();
 };

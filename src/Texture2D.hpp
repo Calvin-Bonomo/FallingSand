@@ -6,7 +6,7 @@ class Texture2D : public Texture
 {
 public:
   template<size_t N, size_t M>
-  Texture2D(const unsigned char (&data)[N][M], int lods, GLint internalFormat, GLenum pixelFormat);
+  Texture2D(const unsigned int (&data)[N][M], int lods, GLint internalFormat, GLenum pixelFormat);
   template<typename T, size_t N, size_t M>
   void Update(const T (&data)[N][M], int lod, int xOffset, int yOffset);
   template<typename T, size_t N, size_t M>
@@ -23,8 +23,8 @@ private:
 };
 
 template<size_t N, size_t M>
-Texture2D::Texture2D(const unsigned char (&data)[N][M], int lods, GLint internalFormat, GLenum pixelFormat)
-  : m_LODs(lods), m_Width(N), m_Height(M), Texture(GL_TEXTURE_2D, internalFormat, GL_UNSIGNED_BYTE, pixelFormat)
+Texture2D::Texture2D(const unsigned int (&data)[N][M], int lods, GLint internalFormat, GLenum pixelFormat)
+  : m_LODs(lods), m_Width(N), m_Height(M), Texture(GL_TEXTURE_2D, GL_UNSIGNED_INT, internalFormat, pixelFormat)
 {
   this->Init(data);
 }

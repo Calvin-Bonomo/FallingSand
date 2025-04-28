@@ -16,14 +16,13 @@ private:
   bool m_Bound;
 
 public:
-  Buffer();
+  template<typename T, size_t N>
+  Buffer(const T (&data)[N]);
   ~Buffer();
 
   void Bind(GLenum target);
   void Unbind();
 
-  template<typename T, size_t N>
-  void Set(const T (&data)[N]);
   template<typename T, size_t N>
   void Update(const T (&data)[N], unsigned int offset, unsigned int numElements);
   template<typename T, size_t N>
@@ -32,14 +31,18 @@ public:
   GLuint GetSize();
   size_t GetElementSize();
 
-  operator int() const { return m_ID; }
+  operator unsigned int() const { return m_ID; }
 
 private:
+  void Init();
   void SetData(const void *data, size_t size);
 };
 
 template<typename T, size_t N>
-void Buffer::Set(const T (&data)[N]) {
+Buffer::Buffer(const T (&data)[N]) 
+  : m_Size(N), m_ElementSize(sizeof(T))
+{
+  this->Init();
   this->SetData(data, sizeof(T) * N);
 }
 

@@ -9,13 +9,9 @@
 
 class VertexArrayObject
 {
-private:
-  GLuint m_ID;
-  GLuint m_Size;
-  GLint m_LastAttribute;
-
 public:
   VertexArrayObject(Buffer &vertices, Buffer &elements);
+  VertexArrayObject(Buffer &vertices);
   ~VertexArrayObject();
 
   template<typename T>
@@ -23,4 +19,11 @@ public:
 
   void Bind();
   void Unbind();
+
+  void DrawStrip();
+
+private:
+  GLuint m_ID;
+  GLuint m_Size;
+  GLint m_LastAttribute;
 };

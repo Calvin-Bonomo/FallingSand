@@ -25,4 +25,8 @@ public:
 
   void AttachShader(Shader &shader);
   void Link();
+
+  void SetUniform(const std::string &uniformName, GLfloat val[2]);
+  void SetUniform(const std::string &uniformName, GLfloat val1, GLfloat val2);
+  void SetUniform(const std::string &uniformName, GLint val);
 };

@@ -42,3 +42,21 @@ void ShaderProgram::Link() {
     printf("%s\n", log);
   }
 }
+
+void ShaderProgram::SetUniform(const std::string &uniformName, GLfloat val[2]) 
+{
+  int loc = glGetUniformLocation(m_ID, uniformName.c_str());
+  glUniform2fv(loc, 1, val);
+}
+
+void ShaderProgram::SetUniform(const std::string &uniformName, GLfloat val1, GLfloat val2) 
+{
+  int loc = glGetUniformLocation(m_ID, uniformName.c_str());
+  glUniform2f(loc, val1, val2);
+}
+
+void ShaderProgram::SetUniform(const std::string &uniformName, GLint val) 
+{
+  int loc = glGetUniformLocation(m_ID, uniformName.c_str());
+  glUniform1i(loc, val);
+}
