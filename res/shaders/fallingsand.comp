@@ -35,6 +35,10 @@ bool isFlammable(uvec3 cell) {
   return isFlammable(cell.x) && isFlammable(cell.y) && isFlammable(cell.z);
 }
 
+bool isFire(uvec3 cell) {
+  return cell.x == FIRE && cell.y == FIRE && cell.z == FIRE;
+}
+
 uvec4 simulateNeighborhood(uvec4 particles) {
   // Sand rules
   if (particles.x == SAND && particles.z <= LIQUID) return particles.zyxw;
@@ -48,8 +52,8 @@ uvec4 simulateNeighborhood(uvec4 particles) {
   else if (particles.y == WATER && particles.z < WATER) return particles.xzyw;
   else if (particles.x == WATER && particles.y < WATER) return particles.yxzw;
   else if (particles.y == WATER && particles.x < WATER) return particles.yxzw;
-  else if (particles.z == WATER && particles.w < WATER) return particles.xywz;
-  else if (particles.w == WATER && particles.z < WATER) return particles.xywz;
+  // else if (particles.z == WATER && particles.w < WATER) return particles.xywz;
+  // else if (particles.w == WATER && particles.z < WATER) return particles.xywz;
   // Smoke rules
   else if (particles.z == SMOKE && particles.x < SMOKE) return particles.zyxw;
   else if (particles.z == SMOKE && particles.y < SMOKE) return particles.xzyw;
@@ -66,9 +70,9 @@ uvec4 simulateNeighborhood(uvec4 particles) {
   else if (particles.z == FIRE && isFlammable(particles.w)) return particles.xyzz;
   else if (particles.w == FIRE && isFlammable(particles.y)) return particles.xwzw;
   else if (particles.w == FIRE && isFlammable(particles.z)) return particles.xyww;
-  else if (particles.x == FIRE && !isFlammable(particles.yzw)) return uvec4(AIR, particles.yzw);
+  else if (particles.x == FIRE && !isFlammable(particles.yzw)) return uvec4(SMOKE, particles.yzw);
   else if (particles.y == FIRE && !isFlammable(particles.xzw)) return uvec4(particles.x, SMOKE, particles.zw);
-  else if (particles.z == FIRE && !isFlammable(particles.xyw)) return uvec4(particles.xy, AIR, particles.w);
+  else if (particles.z == FIRE && !isFlammable(particles.xyw)) return uvec4(particles.xy, SMOKE, particles.w);
   else if (particles.w == FIRE && !isFlammable(particles.xyz)) return uvec4(particles.xyz, SMOKE);
   // Oil rules
   else if (particles.x == OIL && particles.z < OIL) return particles.zyxw;
@@ -77,8 +81,8 @@ uvec4 simulateNeighborhood(uvec4 particles) {
   else if (particles.y == OIL && particles.z < OIL) return particles.xzyw;
   else if (particles.x == OIL && particles.y < OIL) return particles.yxzw;
   else if (particles.y == OIL && particles.x < OIL) return particles.yxzw;
-  else if (particles.z == OIL && particles.w < OIL) return particles.xywz;
-  else if (particles.w == OIL && particles.z < OIL) return particles.xywz;
+  // else if (particles.z == OIL && particles.w < OIL) return particles.xywz;
+  // else if (particles.w == OIL && particles.z < OIL) return particles.xywz;
   return particles;
 }
 
