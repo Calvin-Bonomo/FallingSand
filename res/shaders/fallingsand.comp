@@ -1,47 +1,23 @@
-#version 430
+#version 460
 
 layout(local_size_x=32, local_size_y=32) in;
 
-layout(r8ui) uniform uimage2D buf;
+layout(r32ui) uniform uimage2D buf;
 uniform uint iteration;
 uniform ivec2 simSize;
 
-const uint STATIC_MASK = 0x1u;
-const uint SPREADING_MASK = 0x2u;
-const uint LIFTING_MASK = 0x4u;
+const uint GAS = 1;
+const uint LIQUID = 3;
+const uint SOLID = 6;
 
-const uint AIR = 0x00000000;
-const uint WALL = 0x01007f01;
-const uint SAND = 0x00000f02;
-const uint WATER = 0x02000e03;
-const uint STEAM = 0x04008004;
-
-uint getFlag(uint particle) {
-  return (particle >> 24) & 0xffu;
-}
-
-uvec4 getFlags(uvec4 particles) {
-  return uvec4(getFlag(particles.x), getFlag(particles.y), getFlag(particles.z), getFlag(particles.w));
-}
-
-uint getMaterial(uint particle) {
-  return particle & 0xffu;
-}
-
-uvec4 getMaterials(uvec4 materials) {
-  return uvec4(getMaterial(materials.x), getMaterial(materials.y), getMaterial(materials.z), getMaterial(materials.w));
-}
-
-int getDensity(uint particle) {
-  int density = int(particle >> 8) & 0xff;
-  int signedness = (density & 0x80) << 24;
-  density &= 0x7f;
-  return density | signedness;
-}
-
-ivec4 getDensities(uvec4 particles) {
-  return ivec4(getDensity(particles.x), getDensity(particles.y), getDensity(particles.z), getDensity(particles.w));
-}
+const uint AIR = 0;
+const uint SMOKE = 1;
+const uint OIL = 2;
+const uint WATER = 3;
+const uint SAND = 4;
+const uint WOOD = 5;
+const uint WALL = 6;
+const uint FIRE = 7;
 
 uvec4 getNeighborhood(ivec2 pos) {
   uvec4 data = uvec4(imageLoad(buf, pos).r, 0, 0, 0);
@@ -51,71 +27,58 @@ uvec4 getNeighborhood(ivec2 pos) {
   return data;
 }
 
+bool isFlammable(uint cell) {
+  return cell == WOOD || cell == OIL;
+}
+
+bool isFlammable(uvec3 cell) {
+  return isFlammable(cell.x) && isFlammable(cell.y) && isFlammable(cell.z);
+}
+
 uvec4 simulateNeighborhood(uvec4 particles) {
-  ivec4 density = getDensities(particles);
-  uvec4 flags = getFlags(particles);
-  bool falling = false;
-
-  if ((flags.x & STATIC_MASK) == 0) {
-    if (density.x > density.z) {
-      particles = particles.zyxw;
-      density = density.zyxw;
-      falling = true;
-    } 
-    else if (density.x > density.w) {
-      particles = particles.wyzx;
-      density = density.wyzx;
-      falling = true;
-    }
-  } 
-  if ((flags.y & STATIC_MASK) == 0) {
-    if (density.y > density.w) {
-      particles = particles.xwzy;
-      density = density.xwzy;
-      falling = true;
-    } 
-    else if (density.y > density.z) {
-      particles = particles.xzyw;
-      density = density.xzyw;
-      falling = true;
-    }
-  }
-  if (!falling) {
-    if ((flags.x & SPREADING_MASK) != 0 && density.x > density.y && (flags.y & STATIC_MASK) == 0) {
-      particles = particles.yxzw;
-      density = density.yxzw;
-    }
-    else if ((flags.y & SPREADING_MASK) != 0 && density.y > density.x && (flags.x & STATIC_MASK) == 0) {
-      particles = particles.yxzw;
-      density = density.yxzw;
-    }
-    if ((flags.w & SPREADING_MASK) != 0 && density.w > density.z && (flags.z & STATIC_MASK) == 0) {
-      particles = particles.xywz;
-      density = density.xywz;
-    }
-    else if ((flags.z & SPREADING_MASK) != 0 && density.z > density.w && (flags.w & STATIC_MASK) == 0) {
-      particles = particles.xywz;
-      density = density.xywz;
-    }
-
-    if ((flags.x & LIFTING_MASK) != 0 && density.x < density.y && (flags.y & STATIC_MASK) == 0) {
-      particles = particles.yxzw;
-      density = density.yxzw;
-    }
-    else if ((flags.y & LIFTING_MASK) != 0 && density.y < density.x && (flags.x & STATIC_MASK) == 0) {
-      particles = particles.yxzw;
-      density = density.yxzw;
-    }
-    else if ((flags.w & LIFTING_MASK) != 0 && density.w < density.z && (flags.z & STATIC_MASK) == 0) {
-      particles = particles.xywz;
-      density = density.xywz;
-    }
-    else if ((flags.z & LIFTING_MASK) != 0 && density.z < density.w && (flags.w & STATIC_MASK) == 0) {
-      particles = particles.xywz;
-      density = density.xywz;
-    }
-  }
-
+  // Sand rules
+  if (particles.x == SAND && particles.z <= LIQUID) return particles.zyxw;
+  else if (particles.x == SAND && particles.w <= LIQUID) return particles.wyzx;
+  else if (particles.y == SAND && particles.w <= LIQUID) return particles.xwzy;
+  else if (particles.y == SAND && particles.z <= LIQUID) return particles.xzyw;
+  // Water rules
+  else if (particles.x == WATER && particles.z < WATER) return particles.zyxw;
+  else if (particles.x == WATER && particles.w < WATER) return particles.wyzx;
+  else if (particles.y == WATER && particles.w < WATER) return particles.xwzy;
+  else if (particles.y == WATER && particles.z < WATER) return particles.xzyw;
+  else if (particles.x == WATER && particles.y < WATER) return particles.yxzw;
+  else if (particles.y == WATER && particles.x < WATER) return particles.yxzw;
+  else if (particles.z == WATER && particles.w < WATER) return particles.xywz;
+  else if (particles.w == WATER && particles.z < WATER) return particles.xywz;
+  // Smoke rules
+  else if (particles.z == SMOKE && particles.x < SMOKE) return particles.zyxw;
+  else if (particles.z == SMOKE && particles.y < SMOKE) return particles.xzyw;
+  else if (particles.z == SMOKE && particles.w < SMOKE) return particles.xywz;
+  else if (particles.w == SMOKE && particles.y < SMOKE) return particles.xwzy;
+  else if (particles.w == SMOKE && particles.x < SMOKE) return particles.wyzx;
+  else if (particles.w == SMOKE && particles.z < SMOKE) return particles.xywz;
+  // Fire rules
+  else if (particles.x == FIRE && isFlammable(particles.z)) return particles.xyxw;
+  else if (particles.x == FIRE && isFlammable(particles.y)) return particles.xxzw;
+  else if (particles.y == FIRE && isFlammable(particles.w)) return particles.xyzy;
+  else if (particles.y == FIRE && isFlammable(particles.x)) return particles.yyzw;
+  else if (particles.z == FIRE && isFlammable(particles.x)) return particles.zyzw;
+  else if (particles.z == FIRE && isFlammable(particles.w)) return particles.xyzz;
+  else if (particles.w == FIRE && isFlammable(particles.y)) return particles.xwzw;
+  else if (particles.w == FIRE && isFlammable(particles.z)) return particles.xyww;
+  else if (particles.x == FIRE && !isFlammable(particles.yzw)) return uvec4(AIR, particles.yzw);
+  else if (particles.y == FIRE && !isFlammable(particles.xzw)) return uvec4(particles.x, SMOKE, particles.zw);
+  else if (particles.z == FIRE && !isFlammable(particles.xyw)) return uvec4(particles.xy, AIR, particles.w);
+  else if (particles.w == FIRE && !isFlammable(particles.xyz)) return uvec4(particles.xyz, SMOKE);
+  // Oil rules
+  else if (particles.x == OIL && particles.z < OIL) return particles.zyxw;
+  else if (particles.x == OIL && particles.w < OIL) return particles.wyzx;
+  else if (particles.y == OIL && particles.w < OIL) return particles.xwzy;
+  else if (particles.y == OIL && particles.z < OIL) return particles.xzyw;
+  else if (particles.x == OIL && particles.y < OIL) return particles.yxzw;
+  else if (particles.y == OIL && particles.x < OIL) return particles.yxzw;
+  else if (particles.z == OIL && particles.w < OIL) return particles.xywz;
+  else if (particles.w == OIL && particles.z < OIL) return particles.xywz;
   return particles;
 }
 

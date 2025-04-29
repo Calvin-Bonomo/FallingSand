@@ -5,20 +5,16 @@ Texture::~Texture()
   glDeleteTextures(1, &m_ID);
 }
 
-void Texture::Bind(int textureUnit) 
+void Texture::Bind() 
 {
-  if (textureUnit < 0) return;
-  m_TextureUnit = textureUnit;
-  glActiveTexture(GL_TEXTURE0 + m_TextureUnit);
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(m_Target, m_ID);
 }
 
 void Texture::Unbind() 
 {
-  if (m_TextureUnit < 0) return;
-  glActiveTexture(GL_TEXTURE0 + m_TextureUnit);
+  glActiveTexture(GL_TEXTURE0);
   glBindTexture(m_Target, 0);
-  m_TextureUnit = -1;
 }
 
 void Texture::SetWrapMode(WrapMode mode) 
@@ -42,10 +38,27 @@ void Texture::SetWrapMode(WrapMode mode)
       val = GL_MIRRORED_REPEAT;
       break;
   }
-  Bind(0);
+  glBindTexture(m_Target, m_ID);
   glTexParameteri(m_Target, GL_TEXTURE_WRAP_S, val);
   glTexParameteri(m_Target, GL_TEXTURE_WRAP_T, val);
-  Unbind();
+  glBindTexture(m_Target, 0);
+}
+
+void Texture::SetFilteringMode(FilteringMode mode) 
+{
+  int val;
+  switch(mode) {
+    case FilteringMode::Nearest:
+      val = GL_NEAREST;
+      break;
+    case FilteringMode::Linear:
+      val = GL_LINEAR;
+      break;
+  }
+  glBindTexture(m_Target, m_ID);
+  glTexParameteri(m_Target, GL_TEXTURE_MIN_FILTER, val);
+  glTexParameteri(m_Target, GL_TEXTURE_MAG_FILTER, val);
+  glBindTexture(m_Target, 0);
 }
 
 inline size_t Texture::TypeToSize(GLenum type) 
@@ -87,5 +100,10 @@ Texture::Texture(GLenum target, GLenum type, GLint internalFormat, GLenum pixelF
   : m_Target(target), m_Type(type), m_InternalFormat(internalFormat), 
   m_PixelFormat(pixelFormat), m_PixelSize(TypeToSize(type))
 {
-  glCreateTextures(m_Target, 1, &m_ID);
+  glGenTextures(1, &m_ID);
+}
+
+void Texture::BindAsImage(GLuint unit, GLint level, bool layered, GLint layer, GLenum access) 
+{
+  glBindImageTexture(unit, m_ID, level, layered? GL_TRUE : GL_FALSE, layer, access, m_InternalFormat);
 }

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VERTEX_ARRAY_OBJECT
+#define VERTEX_ARRAY_OBJECT
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
@@ -27,3 +28,5 @@ private:
   GLuint m_Size;
   GLint m_LastAttribute;
 };
+
+#endif

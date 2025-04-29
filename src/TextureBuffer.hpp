@@ -1,4 +1,5 @@
-#pragma once
+#ifndef TEXTURE_BUFFER
+#define TEXTURE_BUFFER
 
 #include <memory>
 
@@ -24,3 +25,5 @@ public:
 
   operator int() const { return m_ID; }
 };
+
+#endif

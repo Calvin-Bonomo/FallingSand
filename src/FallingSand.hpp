@@ -1,4 +1,5 @@
-#pragma once
+#ifndef FALLING_SAND
+#define FALLING_SAND
 
 #define GL_GLEXT_PROTOTYPES
 #include "GLFW/glfw3.h"
@@ -30,6 +31,7 @@ private: // constants
   DEFAULT_SIM_WIDTH = 65, DEFAULT_SIM_HEIGHT = 65;
   static constexpr double DEFAULT_TICK_SPEED = 1.0 / 60.0;
   static constexpr char WINDOW_NAME[18] = "Falling Sand Game";
+  static constexpr unsigned int NUM_CELLS = 8;
 
 private:
   GLFWwindow *m_Window;
@@ -46,6 +48,8 @@ private:
   bool m_MouseDown;
   double m_MousePos[2];
 
+  int m_CellType = 0;
+
 public:
   FallingSand(FallingSand &game) = delete;
   FallingSand(FallingSand &&game) = delete;
@@ -53,10 +57,11 @@ public:
   ~FallingSand();
 
   void Play();
-  void SetDimensions(unsigned int width, unsigned int height);
 
 private:
+  void DoInteraction();
   void CreateRenderQuad();
+  void SetDimensions(unsigned int width, unsigned int height);
   void LoadConfig(std::string path);
   void CreateWindow();
   void Display();
@@ -67,3 +72,5 @@ private:
   static void MouseDownCallback(GLFWwindow *window, int button, int action, int mods);
   static void WindowResizeCallback(GLFWwindow* window, int width, int height);
 };
+
+#endif

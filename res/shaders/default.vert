@@ -1,4 +1,4 @@
-#version 430
+#version 460
 
 uniform vec2 texelSize;
 

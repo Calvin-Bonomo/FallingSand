@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BUFFER
+#define BUFFER
 
 #include <stdexcept>
 #define GL_GLEXT_PROTOTYPES
@@ -59,3 +60,5 @@ void Buffer::Get(T (&data)[N], unsigned int offset, unsigned int numElements)
   if (numElements + offset > m_Size) throw std::out_of_range();
   glGetNamedBufferSubData(m_ID, offset * sizeof(T), sizeof(T) * numElements, data);
 }
+
+#endif

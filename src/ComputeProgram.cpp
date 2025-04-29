@@ -1,6 +1,7 @@
 #include "ComputeProgram.hpp"
 
-ComputeProgram::ComputeProgram(Shader &shader) {
+ComputeProgram::ComputeProgram(Shader &shader) 
+{
   if (shader.GetType() != GL_COMPUTE_SHADER) throw std::exception();
   m_ID = glCreateProgram();
   shader.Attach(m_ID);
@@ -19,34 +20,32 @@ ComputeProgram::ComputeProgram(Shader &shader) {
   }
 }
 
-ComputeProgram::~ComputeProgram() {
+void ComputeProgram::Use() 
+{
+  glUseProgram(m_ID);
+}
+
+ComputeProgram::~ComputeProgram() 
+{
   glDeleteProgram(m_ID);
 }
 
 void ComputeProgram::Dispatch(GLuint xThreads, GLuint yThreads, GLuint zThreads) {
-  glUseProgram(m_ID);
   glDispatchCompute(xThreads, yThreads, zThreads);
-  glUseProgram(0);
 }
 
 void ComputeProgram::SetUniform(const std::string &uniformName, GLuint val) {
   GLint loc = glGetUniformLocation(m_ID, uniformName.c_str());
-  glUseProgram(m_ID);
   glUniform1ui(loc, val);
-  glUseProgram(0);
 }
 
 void ComputeProgram::SetUniform(const std::string &uniformName, GLint val[2]) {
   GLint loc = glGetUniformLocation(m_ID, uniformName.c_str());
-  glUseProgram(m_ID);
   glUniform2iv(loc, 2, val);
-  glUseProgram(0);
 }
 
 void ComputeProgram::SetUniform(const std::string &uniformName, GLint val) 
 {
   GLint loc = glGetUniformLocation(m_ID, uniformName.c_str());
-  glUseProgram(m_ID);
   glUniform1i(loc, val);
-  glUseProgram(0);
 }

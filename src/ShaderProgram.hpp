@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHADER_PROGRAM
+#define SHADER_PROGRAM
 
 #include <string>
 #include <iostream>
@@ -30,3 +31,5 @@ public:
   void SetUniform(const std::string &uniformName, GLfloat val1, GLfloat val2);
   void SetUniform(const std::string &uniformName, GLint val);
 };
+
+#endif

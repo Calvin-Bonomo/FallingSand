@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GLFW_CONTEXT
+#define GLFW_CONTEXT
 
 #include "GLFW/glfw3.h"
 
@@ -19,3 +20,5 @@ private:
 public:
   static void Init();
 };
+
+#endif

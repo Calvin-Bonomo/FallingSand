@@ -1,4 +1,5 @@
-#pragma once
+#ifndef COMPUTE_PROGRAM
+#define COMPUTE_PROGRAM
 
 #include <string>
 #include <iostream>
@@ -21,8 +22,12 @@ public:
   ComputeProgram(Shader &shader);
   ~ComputeProgram();
 
+  void Use();
+
   void Dispatch(GLuint xThreads, GLuint yThreads, GLuint zThreads);
   void SetUniform(const std::string &uniformName, GLuint val);
   void SetUniform(const std::string &uniformName, GLint val[2]);
   void SetUniform(const std::string &uniformName, GLint val);
 };
+
+#endif

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHADER
+#define SHADER
 
 #include <string>
 #include <iostream>
@@ -34,3 +35,5 @@ public:
 private:
   std::string ReadShader(const std::string &filename);
 };
+
+#endif

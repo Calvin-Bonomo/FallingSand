@@ -1,7 +1,9 @@
-#pragma once
+#ifndef TEXTURE
+#define TEXTURE
 
 #include <cassert>
 #include <array>
+#include "stdio.h"
 
 #define GL_GLEXT_PROTOTYPES
 #include <GLFW/glfw3.h>
@@ -16,15 +18,23 @@ enum class WrapMode {
   MirroredRepeat
 };
 
+enum class FilteringMode {
+  Nearest,
+  Linear
+};
+
 class Texture
 {
 public:
   ~Texture();
 
-  void Bind(int textureUnit);
+  void Bind();
   void Unbind();
 
+  void BindAsImage(GLuint unit, GLint level, bool layered, GLint layer, GLenum access);
+
   void SetWrapMode(WrapMode mode);
+  void SetFilteringMode(FilteringMode mode);
 
 protected:
   Texture(GLenum target, GLenum type, GLint internalFormat, GLenum pixelFormat);
@@ -38,7 +48,6 @@ protected:
   size_t m_PixelSize;
   GLenum m_Target, m_PixelFormat, m_Type;
   GLint m_InternalFormat;
-
-private:
-  int m_TextureUnit;
 };
+
+#endif
