@@ -56,7 +56,7 @@ bool close_to(float val, float target) {
 }
 
 void main() {
-  uint data = texture(buf, texCoord).r;
+  uint data = texture(buf, floor(texCoord * 65) / 65).r;
   vec3 color = BG_COLOR * scaled_noise(floor(texCoord * 65), 0.96, 1);
   switch (data) {
     case 1: // SMOKE
