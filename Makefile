@@ -1,18 +1,18 @@
 CXX := g++
-CXXFLAGS := 
+CXXFLAGS := -O3
 LIBS := -lglfw -lGL -lm -lGLU
 objects := $(patsubst %.cpp,%.o,$(wildcard src/*.cpp))
 headers := $(wildcard src/*.hpp)
 
-.PHONY: final
+.PHONY: falling_sand clean
 
-all: final
+all: falling_sand
 
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -DDEBUG -c -o $@ $?
 
-final: $(objects) $(headers)
+falling_sand: $(objects) $(headers)
 	$(CXX) $(CXXFLAGS) -o $@ $? $(LIBS)
 
 clean:
-	rm -f src/*.o final
+	rm -f src/*.o falling_sand
