@@ -2,13 +2,13 @@
 
 uniform vec2 texelSize;
 
-in vec2 pos;
+layout(location = 0)in vec4 point;
 
 out vec2 texCoord;
 
 void main() {
-  texCoord = (pos + 1) * 0.5;
+  texCoord = point.zw;
   texCoord *= 1 - 2 * texelSize;
-  texCoord += texelSize;
-  gl_Position = vec4(pos, 0, 1);
+  texCoord += texelSize * 2;
+  gl_Position = vec4(point.xy, 0, 1);
 }
