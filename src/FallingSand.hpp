@@ -14,14 +14,12 @@
 #include "Texture2D.hpp"
 
 #include <string>
-#include <array>
-#include <vector>
 #include <memory>
 
 typedef unsigned char cell_t;
 
 struct point {
-  float x, y;
+  float x, y, uv_x, uv_y;
 };
 
 class FallingSand

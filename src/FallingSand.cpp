@@ -3,48 +3,43 @@
 GLFWContext *GLFWContext::m_Instance = nullptr;
 
 #ifdef DEBUG
-void GLAPIENTRY debugCallback( GLenum source,
-  GLenum type,
-  GLuint id,
-  GLenum severity,
-  GLsizei length,
-  const GLchar* message,
-  const void* userParam )
-{
-  if (severity == GL_DEBUG_SEVERITY_NOTIFICATION) return;
-  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-    ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-    type, severity, message );
+void GLAPIENTRY debugCallback(GLenum source, GLenum type, GLuint id,
+                              GLenum severity, GLsizei length,
+                              const GLchar *message, const void *userParam) {
+  if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+    return;
+  fprintf(stderr,
+          "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+          (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""), type, severity,
+          message);
 }
 #endif
 
-FallingSand::FallingSand(unsigned int windowWidth, unsigned int windowHeight, std::string configPath)
-  : m_Width(windowWidth), m_Height(windowHeight), m_Window(nullptr)
-{
-  m_RenderScale[0] = m_Width / DEFAULT_SIM_WIDTH;
-  m_RenderScale[1] = m_Height / DEFAULT_SIM_HEIGHT;
+FallingSand::FallingSand(unsigned int windowWidth, unsigned int windowHeight,
+                         std::string configPath)
+    : m_Width(windowWidth), m_Height(windowHeight), m_Window(nullptr) {
   CreateWindow();
-  #ifdef DEBUG
+#ifdef DEBUG
   glEnable(GL_DEBUG_OUTPUT);
   glDebugMessageCallback(debugCallback, 0);
-  #endif
+#endif
   unsigned int cells[DEFAULT_SIM_WIDTH][DEFAULT_SIM_HEIGHT];
-  for (int i = 0; i < DEFAULT_SIM_WIDTH; i++) 
-  {
-    for (int j = 0; j < DEFAULT_SIM_HEIGHT; j++) 
-    {
+  for (int i = 0; i < DEFAULT_SIM_WIDTH; i++) {
+    for (int j = 0; j < DEFAULT_SIM_HEIGHT; j++) {
       cells[i][j] = 0;
-      if (!i || !j || i == DEFAULT_SIM_WIDTH - 1 || j == DEFAULT_SIM_HEIGHT - 1) cells[i][j] = 6;
+      if (!i || !j || i == DEFAULT_SIM_WIDTH - 1 || j == DEFAULT_SIM_HEIGHT - 1)
+        cells[i][j] = 6;
     }
   }
 
   CreateRenderQuad();
 
-  m_CellsTexture = std::make_unique<Texture2D>(cells, 1, GL_R32UI, GL_RED_INTEGER);
+  m_CellsTexture =
+      std::make_unique<Texture2D>(cells, 1, GL_R32UI, GL_RED_INTEGER);
 
-  Shader vert("res/shaders/default.vert", ShaderType::Vertex), 
-    frag("res/shaders/finaldraw.frag", ShaderType::Fragment),
-    comp("res/shaders/fallingsand.comp", ShaderType::Compute);
+  Shader vert("res/shaders/default.vert", ShaderType::Vertex),
+      frag("res/shaders/finaldraw.frag", ShaderType::Fragment),
+      comp("res/shaders/fallingsand.comp", ShaderType::Compute);
   m_DisplayProgram = std::make_unique<ShaderProgram>();
   m_ComputeSim = std::make_unique<ComputeProgram>(comp);
   m_DisplayProgram->AttachShader(vert);
@@ -52,26 +47,24 @@ FallingSand::FallingSand(unsigned int windowWidth, unsigned int windowHeight, st
   m_DisplayProgram->Link();
 }
 
-FallingSand::~FallingSand() 
-{
-  glfwDestroyWindow(m_Window);
-}
+FallingSand::~FallingSand() { glfwDestroyWindow(m_Window); }
 
-void FallingSand::CreateRenderQuad() 
-{
-  point points[4] = {{-1, -1}, {-1, 1}, {1, -1}, {1, 1}};
+void FallingSand::CreateRenderQuad() {
+  float xLen = 1.0f, yLen = 1.0f;
+  if (m_Width < m_Height) 
+    yLen = ((float)m_Width / (float)m_Height);
+  else if (m_Width > m_Height)
+    xLen = ((float)m_Height / (float)m_Width);
+  printf("%f %f\n", xLen, yLen);
+  point points[4] = {{-xLen, -yLen, 0.0, 0.0}, {-xLen, yLen, 0.0, 1.0}, {xLen, -yLen, 1.0, 0.0}, {xLen, yLen, 1.0, 1.0}};
   Buffer pointBuf(points);
   m_DrawQuad = std::make_unique<VertexArrayObject>(pointBuf);
-  m_DrawQuad->AddAttribute<float>(false, 0, 2);
+  m_DrawQuad->AddAttribute<float>(false, 0, 4);
 }
 
-void FallingSand::LoadConfig(std::string path) 
-{
+void FallingSand::LoadConfig(std::string path) {}
 
-}
-
-void FallingSand::Play() 
-{
+void FallingSand::Play() {
   double deltaTime, currentTime, lastTickTime = glfwGetTime();
   while (!glfwWindowShouldClose(m_Window)) {
     currentTime = glfwGetTime();
@@ -93,29 +86,29 @@ void FallingSand::Play()
   }
 }
 
-void FallingSand::CreateWindow() 
-{
+void FallingSand::CreateWindow() {
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-  #ifdef DEBUG
+#ifdef DEBUG
   glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-  #endif
+#endif
   m_Window = glfwCreateWindow(m_Width, m_Height, WINDOW_NAME, NULL, NULL);
-  if (!m_Window) exit(1); // Window creation failed
+  if (!m_Window)
+    exit(1); // Window creation failed
   glfwMakeContextCurrent(m_Window);
 
   // Setup callbacks
   glfwSetMouseButtonCallback(m_Window, FallingSand::MouseDownCallback);
   glfwSetCursorPosCallback(m_Window, FallingSand::MouseMoveCallback);
   glfwSetKeyCallback(m_Window, FallingSand::KeyPressCallback);
+  glfwSetFramebufferSizeCallback(m_Window, FallingSand::WindowResizeCallback);
   glfwSetWindowUserPointer(m_Window, this);
 
   SetDimensions(m_Width, m_Height);
 }
 
-void FallingSand::Display() 
-{
+void FallingSand::Display() {
   glClear(GL_COLOR_BUFFER_BIT);
   m_DrawQuad->Bind();
   m_DisplayProgram->Use();
@@ -126,64 +119,94 @@ void FallingSand::Display()
   glFlush();
 }
 
-void FallingSand::DoInteraction() 
-{
-  unsigned int cellBuf[3][3], 
-    xOffset = m_MousePos[0] / m_RenderScale[0] - 1, 
-    yOffset = (m_Height - m_MousePos[1]) / m_RenderScale[1] - 1;
+void FallingSand::DoInteraction() {
+  if (!m_MouseDown)
+      return;
+  int width, height;
+  glfwGetWindowSize(m_Window, &width, &height);
+  unsigned int cellBuf[3][3], xOffset = m_MousePos[0],
+                              yOffset = height - m_MousePos[1];
+  unsigned int minX = 0, minY = 0, maxX = width, maxY = height;
+  float scale = height;
 
-  if (!m_MouseDown 
-    || xOffset < 1 || xOffset > m_SimDim[0] - 3 
-    || yOffset < 1 || yOffset > m_SimDim[1] - 3) return;
+  if (width > height)
+  {
+    minX = (width - height) / 2;
+    maxX = minX + height;
+  }
+  else if (height > width)
+  {
+    minY = (height - width) / 2;
+    maxY = minY + width;
+    scale = width;
+  }
+
+  if (xOffset < minX || xOffset > maxX || yOffset < minY || yOffset > maxY)
+    return;
+
+  xOffset = (float)(xOffset - minX) / scale * 63.0f;
+  yOffset = (float)(yOffset - minY) / scale * 63.0f;
+
+  if (xOffset < 1 || xOffset > m_SimDim[0] - 3 || yOffset < 1 || yOffset > m_SimDim[1] - 3)
+      return;
 
   m_CellsTexture->Bind();
   m_CellsTexture->Get(cellBuf, 0, xOffset, yOffset);
   for (int i = 0; i < 3; i++) {
     for (int j = 0; j < 3; j++) {
-      if (!cellBuf[i][j]) { 
+      if (!cellBuf[i][j]) {
         cellBuf[i][j] = m_CellType;
       } else if (!m_CellType) {
         cellBuf[i][j] = m_CellType;
       }
     }
   }
-  
+
   m_CellsTexture->Update(cellBuf, 0, xOffset, yOffset);
   m_CellsTexture->Unbind();
 }
 
-void FallingSand::SetDimensions(unsigned int width, unsigned int height) 
-{
+void FallingSand::SetDimensions(unsigned int width, unsigned int height) {
   m_Width = width;
   m_Height = height;
+
+  m_RenderScale[0] = m_Width / DEFAULT_SIM_WIDTH;
+  m_RenderScale[1] = m_Height / DEFAULT_SIM_HEIGHT;
+
   glViewport(0, 0, m_Width, m_Height);
+
+  CreateRenderQuad();
 }
 
-void FallingSand::KeyPressCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
-{
-  if (action == GLFW_REPEAT || action == GLFW_RELEASE) return;
+void FallingSand::KeyPressCallback(GLFWwindow *window, int key, int scancode,
+                                   int action, int mods) {
+  if (action == GLFW_REPEAT || action == GLFW_RELEASE)
+    return;
   FallingSand *game = (FallingSand *)glfwGetWindowUserPointer(window);
 
-  if (key == GLFW_KEY_ESCAPE) glfwSetWindowShouldClose(window, GLFW_TRUE);
-  else if (key == GLFW_KEY_SPACE) game->m_CellType = (game->m_CellType + 1) % FallingSand::NUM_CELLS;
+  if (key == GLFW_KEY_ESCAPE)
+    glfwSetWindowShouldClose(window, GLFW_TRUE);
+  else if (key == GLFW_KEY_SPACE)
+    game->m_CellType = (game->m_CellType + 1) % FallingSand::NUM_CELLS;
 }
 
-void FallingSand::MouseMoveCallback(GLFWwindow *window, double xpos, double ypos) 
-{
+void FallingSand::MouseMoveCallback(GLFWwindow *window, double xpos,
+                                    double ypos) {
   FallingSand *game = (FallingSand *)glfwGetWindowUserPointer(window);
   game->m_MousePos[0] = xpos;
   game->m_MousePos[1] = ypos;
 }
 
-void FallingSand::MouseDownCallback(GLFWwindow *window, int button, int action, int mods) 
-{
+void FallingSand::MouseDownCallback(GLFWwindow *window, int button, int action,
+                                    int mods) {
   FallingSand *game = (FallingSand *)glfwGetWindowUserPointer(window);
-  if (button != GLFW_MOUSE_BUTTON_LEFT) return;
+  if (button != GLFW_MOUSE_BUTTON_LEFT)
+    return;
   game->m_MouseDown = action != GLFW_RELEASE;
 }
 
-void FallingSand::WindowResizeCallback(GLFWwindow* window, int width, int height) 
-{
+void FallingSand::WindowResizeCallback(GLFWwindow *window, int width,
+                                       int height) {
   FallingSand *game = (FallingSand *)glfwGetWindowUserPointer(window);
   game->SetDimensions(width, height);
 }
